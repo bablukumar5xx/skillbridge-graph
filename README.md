@@ -99,7 +99,7 @@ Every node carries a stable `id` used for parameterised lookups; labels and type
 
 ## 🚀 Live demo
 
-- **App:** ~https://skillbridge.onrender.com~ — *(to be populated after the Render deploy)*
+- **App:** https://skillbridge-graph.onrender.com — deployed on Render free tier. *(Free instances sleep when idle; the first request after a nap can take ~30s to wake.)*
 - **Screen recording:** `docs/demo.webm` — a ~30s walkthrough of the Pathfinder tools (learning path, role bridge, skill gap) in action.
 
 ---
