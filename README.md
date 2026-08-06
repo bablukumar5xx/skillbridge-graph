@@ -99,8 +99,8 @@ Every node carries a stable `id` used for parameterised lookups; labels and type
 
 ## 🚀 Live demo
 
-- **App:** _hosted link — to be added after final run-through (free tier of Render / Railway)._
-- **Screen recording:** `docs/demo.mp4` placeholder — I'll include via a short loom during the run.
+- **App:** ~https://skillbridge.onrender.com~ — *(to be populated after the Render deploy)*
+- **Screen recording:** `docs/demo.webm` — a ~30s walkthrough of the Pathfinder tools (learning path, role bridge, skill gap) in action.
 
 ---
 
