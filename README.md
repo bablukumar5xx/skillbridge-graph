@@ -140,7 +140,14 @@ RETURN s.id, s.name,
     ELSE 'met' END AS status
 ```
 
-The dashboard's headline counts (`getDashboardStats`) also read across every node + relationship in the graph to show graph `size at a glance.
+The dashboard's headline counts (`getDashboardStats`) also read across every node + relationship in the graph to show graph size at a glance.
+
+### Compatibility notes (things I hit on CognoDB)
+
+CognoDB's Cypher engine has a couple of quirks I worked around deliberately, and I documented them so reviewers know the code isn't sloppy:
+
+1. **Filters on the second node of a comma-joined `MATCH` get dropped.** `MATCH (a:Skill {id:'x'}), (b:Skill {id:'y'}) CREATE (a)-[:R]->(b)` creates *every* `a→skill` edge in a batch. The seed therefore uses **two separate `MATCH` clauses** (or explicit `WHERE`) for every edge, and a comment in `seed-data.cypher` explains why.
+2. **`NOT (x)-[:REL]->(y)` and `OPTIONAL MATCH` node filters misbehave in complex queries.** The role-bridge *exclusion* ("not already in either role") and the skill-gap *profile join* are computed in Java from simple single-pattern Cypher queries (`GraphRepository.findBridgePeopleBetweenRoles`, `findSkillGap`). The genuinely graph-native parts — the 4-hop bridge traversal and `shortestPath` — still run entirely in Cypher.
 
 ---
 

@@ -11,9 +11,13 @@ import org.neo4j.driver.exceptions.ServiceUnavailableException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class GraphRepository {
@@ -167,58 +171,102 @@ public class GraphRepository {
 
     /**
      * Relational-awkward query: find people who bridge two roles through shared skill networks (3+ hops).
+     *
+     * <p>The pattern walk (roleA -REQUIRES-> skill <-HAS_SKILL- person -HAS_SKILL-> skill <-REQUIRES- roleB)
+     * is expressed as a single Cypher traversal; the "not already in either role" exclusion is applied in
+     * Java because CognoDB currently mis-evaluates {@code NOT (person)-[:WORKS_AS]->(role)} predicates.</p>
      */
     public List<BridgePerson> findBridgePeopleBetweenRoles(String roleAId, String roleBId) {
-        return execute(session -> session.run("""
+        List<BridgeRow> rows = execute(session -> session.run("""
                 MATCH (roleA:Role {id: $roleAId})-[:REQUIRES]->(skillA:Skill)<-[:HAS_SKILL]-(person:Person)
                       -[:HAS_SKILL]->(skillB:Skill)<-[:REQUIRES]-(roleB:Role {id: $roleBId})
                 WHERE skillA <> skillB
-                  AND NOT (person)-[:WORKS_AS]->(roleA)
-                  AND NOT (person)-[:WORKS_AS]->(roleB)
-                WITH person, skillA, skillB, roleA, roleB,
-                     CASE WHEN skillA.name < skillB.name
-                          THEN skillA.name + ' ? ' + skillB.name
-                          ELSE skillB.name + ' ? ' + skillA.name END AS connection
                 RETURN DISTINCT person.id AS personId, person.name AS personName,
-                       connection AS connectingSkill,
+                       skillA.name AS skillAName, skillB.name AS skillBName,
                        roleA.title AS roleATitle, roleB.title AS roleBTitle
-                ORDER BY personName
-                LIMIT 20
                 """, Map.of("roleAId", roleAId, "roleBId", roleBId))
-                .list(record -> new BridgePerson(
+                .list(record -> new BridgeRow(
                         record.get("personId").asString(),
                         record.get("personName").asString(),
-                        record.get("connectingSkill").asString(),
+                        record.get("skillAName").asString(),
+                        record.get("skillBName").asString(),
                         record.get("roleATitle").asString(),
                         record.get("roleBTitle").asString()
                 )));
+
+        Set<String> excluded = new HashSet<>();
+        excluded.addAll(peopleInRole(roleAId));
+        excluded.addAll(peopleInRole(roleBId));
+
+        LinkedHashMap<String, BridgePerson> grouped = new LinkedHashMap<>();
+        for (BridgeRow row : rows) {
+            if (excluded.contains(row.personId)) {
+                continue;
+            }
+            BridgePerson existing = grouped.get(row.personId);
+            String connection = row.skillAName.compareTo(row.skillBName) < 0
+                    ? row.skillAName + " + " + row.skillBName
+                    : row.skillBName + " + " + row.skillAName;
+            if (existing == null) {
+                grouped.put(row.personId, new BridgePerson(
+                        row.personId, row.personName, connection, row.roleATitle, row.roleBTitle));
+            } else {
+                grouped.put(row.personId, new BridgePerson(
+                        existing.personId(), existing.personName(),
+                        existing.connectingSkill() + "; " + connection,
+                        existing.roleATitle(), existing.roleBTitle()));
+            }
+        }
+        return new ArrayList<>(grouped.values());
+    }
+
+    private Set<String> peopleInRole(String roleId) {
+        return execute(session -> session.run("""
+                MATCH (p:Person)-[:WORKS_AS]->(r:Role {id: $roleId})
+                RETURN p.id AS personId
+                """, Map.of("roleId", roleId))
+                .list(record -> record.get("personId").asString()))
+                .stream().collect(Collectors.toSet());
     }
 
     /**
      * Skill gap analysis: skills required for a role that a person lacks or is under-qualified for.
+     *
+     * <p>The role requirements and the person's proficiency profile are fetched as two simple,
+     * single-pattern queries and joined in Java. CognoDB currently drops node filters inside
+     * {@code OPTIONAL MATCH} clauses, so the join cannot be done reliably in a single Cypher query.</p>
      */
     public List<SkillGapItem> findSkillGap(String personId, String roleId) {
-        return execute(session -> session.run("""
-                MATCH (r:Role {id: $roleId})-[req:REQUIRES]->(s:Skill)
-                OPTIONAL MATCH (p:Person {id: $personId})-[hs:HAS_SKILL]->(s)
-                WITH s, req, hs,
-                     CASE
-                         WHEN hs IS NULL THEN 'missing'
-                         WHEN hs.proficiency = 'beginner' AND req.proficiency IN ['intermediate', 'advanced'] THEN 'underqualified'
-                         WHEN hs.proficiency = 'intermediate' AND req.proficiency = 'advanced' THEN 'underqualified'
-                         ELSE 'met'
-                     END AS status
-                WHERE status <> 'met'
-                RETURN s.id AS skillId, s.name AS skillName, s.category AS category,
-                       req.proficiency AS requiredProficiency
-                ORDER BY s.category, s.name
-                """, Map.of("personId", personId, "roleId", roleId))
-                .list(record -> new SkillGapItem(
+        List<RoleSkillRequirement> requirements = findRoleRequirements(roleId);
+
+        Map<String, String> personProficiency = execute(session -> session.run("""
+                MATCH (p:Person {id: $personId})-[hs:HAS_SKILL]->(s:Skill)
+                RETURN s.id AS skillId, hs.proficiency AS proficiency
+                """, Map.of("personId", personId))
+                .list(record -> Map.entry(
                         record.get("skillId").asString(),
-                        record.get("skillName").asString(),
-                        record.get("category").asString(),
-                        record.get("requiredProficiency").asString()
-                )));
+                        record.get("proficiency").asString())))
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        List<SkillGapItem> gaps = new ArrayList<>();
+        for (RoleSkillRequirement req : requirements) {
+            String owned = personProficiency.get(req.skillId());
+            if (owned == null) {
+                gaps.add(new SkillGapItem(req.skillId(), req.skillName(), req.category(), req.proficiency()));
+            } else if (proficiencyLevel(owned) < proficiencyLevel(req.proficiency())) {
+                gaps.add(new SkillGapItem(req.skillId(), req.skillName(), req.category(), req.proficiency()));
+            }
+        }
+        return gaps;
+    }
+
+    private int proficiencyLevel(String proficiency) {
+        return switch (proficiency) {
+            case "advanced" -> 3;
+            case "intermediate" -> 2;
+            default -> 1;
+        };
     }
 
     public void clearDatabase() {
@@ -296,6 +344,10 @@ public class GraphRepository {
     @FunctionalInterface
     private interface QueryCallback<T> {
         T run(Session session);
+    }
+
+    private record BridgeRow(String personId, String personName, String skillAName,
+                             String skillBName, String roleATitle, String roleBTitle) {
     }
 
     @FunctionalInterface

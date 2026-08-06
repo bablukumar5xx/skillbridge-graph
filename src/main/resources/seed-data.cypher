@@ -33,27 +33,29 @@ CREATE (sysdesign:Skill {id: 'sysdesign', name: 'System Design', category: 'Arch
 CREATE (microservices:Skill {id: 'microservices', name: 'Microservices', category: 'Architecture', difficulty: 4});
 
 // ---------- Skill prerequisites (multi-hop paths) ----------
-MATCH (a:Skill {id: 'java'}), (b:Skill {id: 'oop'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'oop'}), (b:Skill {id: 'spring'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'spring'}), (b:Skill {id: 'rest'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'spring'}), (b:Skill {id: 'microservices'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'microservices'}), (b:Skill {id: 'sysdesign'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
-MATCH (a:Skill {id: 'linux'}), (b:Skill {id: 'docker'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'docker'}), (b:Skill {id: 'k8s'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
-MATCH (a:Skill {id: 'docker'}), (b:Skill {id: 'aws'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'python'}), (b:Skill {id: 'stats'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'stats'}), (b:Skill {id: 'ml'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
-MATCH (a:Skill {id: 'ml'}), (b:Skill {id: 'dl'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 5}]->(b);
-MATCH (a:Skill {id: 'dl'}), (b:Skill {id: 'nlp'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
-MATCH (a:Skill {id: 'sql'}), (b:Skill {id: 'spark'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'python'}), (b:Skill {id: 'spark'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'sql'}), (b:Skill {id: 'cypher'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'cypher'}), (b:Skill {id: 'neo4j'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'git'}), (b:Skill {id: 'linux'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 1}]->(b);
-MATCH (a:Skill {id: 'typescript'}), (b:Skill {id: 'react'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'node'}), (b:Skill {id: 'graphql'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
-MATCH (a:Skill {id: 'rest'}), (b:Skill {id: 'graphql'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
-MATCH (a:Skill {id: 'java'}), (b:Skill {id: 'kafka'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+// NOTE: use two separate MATCH clauses (not comma-joined) — CognoDB currently
+// drops the property filter on the second node of a comma-joined MATCH.
+MATCH (a:Skill {id: 'java'}) MATCH (b:Skill {id: 'oop'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'oop'}) MATCH (b:Skill {id: 'spring'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'spring'}) MATCH (b:Skill {id: 'rest'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'spring'}) MATCH (b:Skill {id: 'microservices'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'microservices'}) MATCH (b:Skill {id: 'sysdesign'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
+MATCH (a:Skill {id: 'linux'}) MATCH (b:Skill {id: 'docker'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'docker'}) MATCH (b:Skill {id: 'k8s'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
+MATCH (a:Skill {id: 'docker'}) MATCH (b:Skill {id: 'aws'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'python'}) MATCH (b:Skill {id: 'stats'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'stats'}) MATCH (b:Skill {id: 'ml'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
+MATCH (a:Skill {id: 'ml'}) MATCH (b:Skill {id: 'dl'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 5}]->(b);
+MATCH (a:Skill {id: 'dl'}) MATCH (b:Skill {id: 'nlp'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 4}]->(b);
+MATCH (a:Skill {id: 'sql'}) MATCH (b:Skill {id: 'spark'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'python'}) MATCH (b:Skill {id: 'spark'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'sql'}) MATCH (b:Skill {id: 'cypher'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'cypher'}) MATCH (b:Skill {id: 'neo4j'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'git'}) MATCH (b:Skill {id: 'linux'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 1}]->(b);
+MATCH (a:Skill {id: 'typescript'}) MATCH (b:Skill {id: 'react'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'node'}) MATCH (b:Skill {id: 'graphql'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
+MATCH (a:Skill {id: 'rest'}) MATCH (b:Skill {id: 'graphql'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 2}]->(b);
+MATCH (a:Skill {id: 'java'}) MATCH (b:Skill {id: 'kafka'}) CREATE (a)-[:PREREQUISITE_FOR {monthsToLearn: 3}]->(b);
 
 // ---------- Roles ----------
 CREATE (be:Role {id: 'backend-eng', title: 'Backend Engineer', level: 'Mid', domain: 'Engineering'});
@@ -112,24 +114,24 @@ MATCH (p:Person {id: 'lisa'}) MATCH (s:Skill) WHERE s.id IN ['sysdesign', 'git',
 MATCH (p:Person {id: 'bablu'}) MATCH (s:Skill) WHERE s.id IN ['java', 'spring', 'sql', 'git', 'rest', 'cypher'] CREATE (p)-[:HAS_SKILL {proficiency: 'advanced', years: 7}]->(s);
 
 // ---------- Works as ----------
-MATCH (p:Person {id: 'priya'}), (r:Role {id: 'backend-eng'}) CREATE (p)-[:WORKS_AS {since: 2020}]->(r);
-MATCH (p:Person {id: 'alex'}), (r:Role {id: 'frontend-eng'}) CREATE (p)-[:WORKS_AS {since: 2021}]->(r);
-MATCH (p:Person {id: 'maria'}), (r:Role {id: 'devops-eng'}) CREATE (p)-[:WORKS_AS {since: 2019}]->(r);
-MATCH (p:Person {id: 'james'}), (r:Role {id: 'ml-engineer'}) CREATE (p)-[:WORKS_AS {since: 2022}]->(r);
-MATCH (p:Person {id: 'sarah'}), (r:Role {id: 'data-engineer'}) CREATE (p)-[:WORKS_AS {since: 2021}]->(r);
-MATCH (p:Person {id: 'david'}), (r:Role {id: 'graph-dev'}) CREATE (p)-[:WORKS_AS {since: 2023}]->(r);
-MATCH (p:Person {id: 'emma'}), (r:Role {id: 'architect'}) CREATE (p)-[:WORKS_AS {since: 2018}]->(r);
-MATCH (p:Person {id: 'raj'}), (r:Role {id: 'frontend-eng'}) CREATE (p)-[:WORKS_AS {since: 2024}]->(r);
-MATCH (p:Person {id: 'lisa'}), (r:Role {id: 'eng-manager'}) CREATE (p)-[:WORKS_AS {since: 2017}]->(r);
-MATCH (p:Person {id: 'bablu'}), (r:Role {id: 'backend-eng'}) CREATE (p)-[:WORKS_AS {since: 2019}]->(r);
+MATCH (p:Person {id: 'priya'}) MATCH (r:Role {id: 'backend-eng'}) CREATE (p)-[:WORKS_AS {since: 2020}]->(r);
+MATCH (p:Person {id: 'alex'}) MATCH (r:Role {id: 'frontend-eng'}) CREATE (p)-[:WORKS_AS {since: 2021}]->(r);
+MATCH (p:Person {id: 'maria'}) MATCH (r:Role {id: 'devops-eng'}) CREATE (p)-[:WORKS_AS {since: 2019}]->(r);
+MATCH (p:Person {id: 'james'}) MATCH (r:Role {id: 'ml-engineer'}) CREATE (p)-[:WORKS_AS {since: 2022}]->(r);
+MATCH (p:Person {id: 'sarah'}) MATCH (r:Role {id: 'data-engineer'}) CREATE (p)-[:WORKS_AS {since: 2021}]->(r);
+MATCH (p:Person {id: 'david'}) MATCH (r:Role {id: 'graph-dev'}) CREATE (p)-[:WORKS_AS {since: 2023}]->(r);
+MATCH (p:Person {id: 'emma'}) MATCH (r:Role {id: 'architect'}) CREATE (p)-[:WORKS_AS {since: 2018}]->(r);
+MATCH (p:Person {id: 'raj'}) MATCH (r:Role {id: 'frontend-eng'}) CREATE (p)-[:WORKS_AS {since: 2024}]->(r);
+MATCH (p:Person {id: 'lisa'}) MATCH (r:Role {id: 'eng-manager'}) CREATE (p)-[:WORKS_AS {since: 2017}]->(r);
+MATCH (p:Person {id: 'bablu'}) MATCH (r:Role {id: 'backend-eng'}) CREATE (p)-[:WORKS_AS {since: 2019}]->(r);
 
 // ---------- Employment ----------
-MATCH (c:Company {id: 'google'}), (p:Person) WHERE p.id IN ['priya', 'james'] CREATE (c)-[:EMPLOYS {since: 2020}]->(p);
-MATCH (c:Company {id: 'meta'}), (p:Person) WHERE p.id IN ['alex', 'emma'] CREATE (c)-[:EMPLOYS {since: 2019}]->(p);
-MATCH (c:Company {id: 'stripe'}), (p:Person) WHERE p.id IN ['maria', 'sarah'] CREATE (c)-[:EMPLOYS {since: 2021}]->(p);
-MATCH (c:Company {id: 'netflix'}), (p:Person) WHERE p.id IN ['raj', 'lisa'] CREATE (c)-[:EMPLOYS {since: 2022}]->(p);
-MATCH (c:Company {id: 'wexa'}), (p:Person) WHERE p.id IN ['david', 'bablu'] CREATE (c)-[:EMPLOYS {since: 2024}]->(p);
-MATCH (c:Company {id: 'databricks'}), (p:Person) WHERE p.id = 'sarah' CREATE (c)-[:EMPLOYS {since: 2019}]->(p);
+MATCH (c:Company {id: 'google'}) MATCH (p:Person) WHERE p.id IN ['priya', 'james'] CREATE (c)-[:EMPLOYS {since: 2020}]->(p);
+MATCH (c:Company {id: 'meta'}) MATCH (p:Person) WHERE p.id IN ['alex', 'emma'] CREATE (c)-[:EMPLOYS {since: 2019}]->(p);
+MATCH (c:Company {id: 'stripe'}) MATCH (p:Person) WHERE p.id IN ['maria', 'sarah'] CREATE (c)-[:EMPLOYS {since: 2021}]->(p);
+MATCH (c:Company {id: 'netflix'}) MATCH (p:Person) WHERE p.id IN ['raj', 'lisa'] CREATE (c)-[:EMPLOYS {since: 2022}]->(p);
+MATCH (c:Company {id: 'wexa'}) MATCH (p:Person) WHERE p.id IN ['david', 'bablu'] CREATE (c)-[:EMPLOYS {since: 2024}]->(p);
+MATCH (c:Company {id: 'databricks'}) MATCH (p:Person) WHERE p.id = 'sarah' CREATE (c)-[:EMPLOYS {since: 2019}]->(p);
 
 // ---------- Companies offer roles ----------
 MATCH (c:Company {id: 'google'}) MATCH (r:Role) WHERE r.id IN ['backend-eng', 'ml-engineer', 'architect'] CREATE (c)-[:OFFERS_ROLE]->(r);
