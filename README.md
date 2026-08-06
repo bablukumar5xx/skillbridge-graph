@@ -55,29 +55,33 @@ I also chose a domain (careers/skills) where every entity's value comes from **t
 ## 🕸️ Data model
 
 ```
-                    ┌─────────────┐
-                    │   (Skill)   │  id, name, category, difficulty
-                    └─────────────┘
-                          ▲
-              PREREQUISITE_FOR {monthsToLearn}
-                          │
-                          ▼
-                 ┌────────────┐
-                 │  (Person)  │  id, name, bio, yearsExperience
-                 └────────────┘
-                      │     │
-        HAS_SKILL{prof, │     │WORKS_AS{since}
-             years}    │     ▼
-                      │  (Role)   id, title, level, domain
-                      │          ▲
-                      │ REQUIRES │ {proficiency}
-                      ▼          │
-      ┌─────────────┐  ┌──────────────┐
-      │  (Company)  │──┼ OFFRES_ROLE  │
-      └─────────────┘  └──────────────┘
-            │ EMPLOYS {since}
-            ▼
-        (Person)  (employment shown above; trusting for a compact diagram)
+                     ┌──────────────┐
+                     │   (Skill)    │  id, name, category, difficulty
+                     └──────────────┘
+                           ▲
+           PREREQUISITE_FOR {monthsToLearn}
+                           │
+                    ┌──────┼──────┐
+                    │             │
+          HAS_SKILL │             │ REQUIRES {proficiency}
+         {prof,     │             │
+          years}    │             ▼
+                    │      ┌────────────┐
+                    │      │  (Role)    │  id, title, level, domain
+                    │      └────────────┘
+                    │             ▲
+                    ▼             │ WORKS_AS {since}
+             ┌────────────┐       │
+             │  (Person)  │───────┘  id, name, bio, yearsExperience
+             └────────────┘
+                    ▲
+      EMPLOYS {since} │
+             ┌───────┴────────┐
+             │   (Company)    │  id, name, industry, location
+             └────────────────┘
+                    │ OFFERS_ROLE
+                    ▼
+               (Role)   (repeated from above)
 ```
 
 The model is a **six-way** network with these labeled relationships:
@@ -212,7 +216,7 @@ The Neo4j driver reads these values from the environment:
 | `SEED_DATA` | load the demo graph on first boot | `true` once, then `false` |
 | `PORT` | HTTP port | `8080` |
 
-> On subsequent runs leave `SEED_DATABASE=false` (or let the app's `hasData()` check skip seeding — it's idempotent).
+> On subsequent runs leave `SEED_DATA=false` (or let the app's `hasData()` check skip seeding — it's idempotent).
 
 ### Standalone seed
 The seed graph is a plain Cypher file (`src/main/resources/seed-data.cypher`). You can run the same statements manually with any Bolt client (Neo4j Browser, `cypher-shell`, the Python/JS drivers) to load data without the app. The app's `DataSeeder` simply executes this file at startup.
@@ -221,7 +225,16 @@ The seed graph is a plain Cypher file (`src/main/resources/seed-data.cypher`). Y
 
 ## 📸 Screenshots
 
-*(Screenshots will be added here after the live run-through — dashboard, Pathfinder results, skill gap.)*
+| | |
+|:---:|:---:|
+| **Dashboard** — live graph stats from CognoDB | **Pathfinder — skill learning path** |
+| ![Dashboard](docs/dashboard.png) | ![Pathfinder learning path](docs/pathfinder-results.png) |
+| **Talent network** | **Person profile with skill-gap checker** |
+| ![People](docs/people.png) | ![Person detail](docs/person-detail.png) |
+| **Skills table** | |
+| ![Skills](docs/skills.png) | |
+
+> The Pathfinder screenshot shows the multi-hop `shortestPath` result (Java → OOP Design → Spring Boot → Microservices → System Design).
 
 ---
 
@@ -230,7 +243,7 @@ The seed graph is a plain Cypher file (`src/main/resources/seed-data.cypher`). Y
 1. Sign up at [console.cognodb.com/signup](https://console.cognodb.com/signup) (no credit card required).
 2. Create a free **c0** instance and pick a region.
 3. Copy the connection URI (`bolt+s://<instance-id>.databases.cognodb.com`), username, and the **one-time password** into `.env`.
-4. Run with `SEED_DB=true`.
+4. Run with `SEED_DATA=true`.
 
 That's it — `GraphDatabase.driver(uri, AuthTokens.basic(user, password))` needs no SDK; the official Neo4j driver over Bolt handles the rest.
 
