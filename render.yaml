@@ -17,5 +17,5 @@ services:
         sync: false                # treat as secret, paste once
       - key: SEED_DATA
         value: true                # idempotent: skipped if the graph already has data
-    domains:
-      - skillbridge.onrender.com
+    # On free tier Render auto-assigns: https://skillbridge-graph.onrender.com
+    # (custom domains require a paid plan, so none are declared here)
