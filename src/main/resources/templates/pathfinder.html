@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pathfinder')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('pathfinder')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>Pathfinder</h1>
+            <p class="subtitle">Three graph-powered tools that would be painful in SQL</p>
+        </div>
+    </header>
+
+    <div class="pathfinder-grid">
+
+        <!-- Skill learning path -->
+        <section class="tool-card">
+            <div class="tool-card-header">
+                <div class="tool-icon">🧭</div>
+                <div>
+                    <h2>Skill Learning Path</h2>
+                    <p>Shortest prerequisite chain between two skills (multi-hop traversal)</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">I know</span>
+                    <select id="pathFrom" class="select-input">
+                        <option value="">Choose a skill…</option>
+                        <option th:each="skill : ${skills}" th:value="${skill.id()}" th:text="${skill.name()}">Java</option>
+                    </select>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">I want to learn</span>
+                    <select id="pathTo" class="select-input">
+                        <option value="">Choose a skill…</option>
+                        <option th:each="skill : ${skills}" th:value="${skill.id()}" th:text="${skill.name()}">Java</option>
+                    </select>
+                </div>
+                <button id="pathSearch" class="btn btn-primary" style="align-self:flex-end">Find Path</button>
+            </div>
+            <div id="pathResults" class="results-panel hidden"></div>
+        </section>
+
+        <!-- Bridge people -->
+        <section class="tool-card">
+            <div class="tool-card-header">
+                <div class="tool-icon">🌉</div>
+                <div>
+                    <h2>Role Bridge</h2>
+                    <p>People who connect two roles through shared skills — a 4-hop graph walk</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">Role A</span>
+                    <select id="bridgeRoleA" class="select-input">
+                        <option value="">Choose a role…</option>
+                        <option th:each="role : ${roles}" th:value="${role.id()}" th:text="${role.title()}">Backend Engineer</option>
+                    </select>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">Role B</span>
+                    <select id="bridgeRoleB" class="select-input">
+                        <option value="">Choose a role…</option>
+                        <option th:each="role : ${roles}" th:value="${role.id()}" th:text="${role.title()}">Backend Engineer</option>
+                    </select>
+                </div>
+                <button id="bridgeSearch" class="btn btn-primary" style="align-self:flex-end">Find Bridges</button>
+            </div>
+            <div id="bridgeResults" class="results-panel hidden"></div>
+        </section>
+
+        <!-- Skill gap -->
+        <section class="tool-card">
+            <div class="tool-card-header">
+                <div class="tool-icon">📋</div>
+                <div>
+                    <h2>Skill Gap Checker</h2>
+                    <p>Skills a person lacks for a target role</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">Person</span>
+                    <select id="gapPerson" class="select-input">
+                        <option value="">Choose a person…</option>
+                        <option th:each="person : ${people}" th:value="${person.id()}" th:text="${person.name()}">Name</option>
+                    </select>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                    <span class="field-label">Target role</span>
+                    <select id="gapRole" class="select-input">
+                        <option value="">Choose a role…</option>
+                        <option th:each="role : ${roles}" th:value="${role.id()}" th:text="${role.title()}"
+                                th:selected="${preselectedRole != null and preselectedRole == role.id()}">Backend Engineer</option>
+                    </select>
+                </div>
+                <button id="gapAnalyzeBtn" class="btn btn-primary" style="align-self:flex-end">Analyze Gap</button>
+            </div>
+            <div id="gapResults" class="results-panel hidden"></div>
+        </section>
+
+    </div>
+</main>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

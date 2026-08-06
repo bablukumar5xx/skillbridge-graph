@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('People')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('people')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>Talent Network</h1>
+            <p class="subtitle">Professionals and their skill profiles</p>
+        </div>
+    </header>
+
+    <div th:if="${#lists.isEmpty(people)}" class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>No people found</h3>
+        <p>Seed the database to explore the talent network.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(people)}" class="card-grid">
+        <a th:each="person : ${people}" th:href="@{/people/{id}(id=${person.id()})}" class="entity-card clickable">
+            <div class="avatar" th:text="${#strings.substring(person.name(), 0, 1)}">P</div>
+            <h3 th:text="${person.name()}">Name</h3>
+            <p class="entity-bio" th:text="${person.bio()}">Bio</p>
+            <span class="entity-meta" th:text="${person.yearsExperience()} + ' years experience'">5 years</span>
+        </a>
+    </div>
+</main>
+</body>
+</html>

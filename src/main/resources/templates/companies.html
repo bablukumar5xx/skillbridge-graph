@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Companies')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('companies')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>Companies</h1>
+            <p class="subtitle">Organizations in the talent network</p>
+        </div>
+    </header>
+
+    <div th:if="${#lists.isEmpty(companies)}" class="empty-state">
+        <div class="empty-icon">🏢</div>
+        <h3>No companies found</h3>
+        <p>Seed the database to explore companies.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(companies)}" class="card-grid">
+        <div class="entity-card" th:each="company : ${companies}">
+            <h3 th:text="${company.name()}">Google</h3>
+            <span class="tag" th:text="${company.industry()}">Technology</span>
+            <p class="entity-meta" th:text="${company.location()}">Location</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

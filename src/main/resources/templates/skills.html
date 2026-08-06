@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Skills')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('skills')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>Skills</h1>
+            <p class="subtitle">Technical skills connected by prerequisite relationships</p>
+        </div>
+    </header>
+
+    <div th:if="${#lists.isEmpty(skills)}" class="empty-state">
+        <div class="empty-icon">💡</div>
+        <h3>No skills found</h3>
+        <p>Run the app with <code>SEED_DATA=true</code> to populate the graph.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(skills)}" class="table-container">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Skill</th>
+                <th>Category</th>
+                <th>Difficulty</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="skill : ${skills}">
+                <td><strong th:text="${skill.name()}">Java</strong></td>
+                <td><span class="tag" th:text="${skill.category()}">Programming</span></td>
+                <td>
+                    <div class="difficulty-bar">
+                        <div class="difficulty-fill" th:style="'width:' + ${skill.difficulty() * 20} + '%'"></div>
+                    </div>
+                    <span class="difficulty-label" th:text="${skill.difficulty()} + '/5'">3/5</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

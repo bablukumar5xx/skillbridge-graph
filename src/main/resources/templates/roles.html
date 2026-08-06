@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Roles')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('roles')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>Career Roles</h1>
+            <p class="subtitle">Job roles and the skills they require</p>
+        </div>
+    </header>
+
+    <div th:if="${#lists.isEmpty(roles)}" class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <h3>No roles found</h3>
+        <p>Seed the database to explore career roles.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(roles)}" class="card-grid">
+        <div class="entity-card" th:each="role : ${roles}">
+            <div class="entity-card-header">
+                <h3 th:text="${role.title()}">Backend Engineer</h3>
+                <span class="tag" th:text="${role.level()}">Mid</span>
+            </div>
+            <p class="entity-meta" th:text="${role.domain()}">Engineering</p>
+            <a th:href="@{/pathfinder(roleId=${role.id()})}" class="card-link">Analyze skill gap →</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

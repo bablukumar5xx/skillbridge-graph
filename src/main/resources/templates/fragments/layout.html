@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' · SkillBridge'">SkillBridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav th:fragment="sidebar(active)" class="sidebar">
+    <div class="sidebar-brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">SkillBridge</span>
+    </div>
+    <ul class="nav-links">
+        <li><a href="/" th:classappend="${active == 'home'} ? 'active' : ''">Dashboard</a></li>
+        <li><a href="/pathfinder" th:classappend="${active == 'pathfinder'} ? 'active' : ''">Pathfinder</a></li>
+        <li><a href="/skills" th:classappend="${active == 'skills'} ? 'active' : ''">Skills</a></li>
+        <li><a href="/roles" th:classappend="${active == 'roles'} ? 'active' : ''">Roles</a></li>
+        <li><a href="/people" th:classappend="${active == 'people'} ? 'active' : ''">People</a></li>
+        <li><a href="/companies" th:classappend="${active == 'companies'} ? 'active' : ''">Companies</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <span>Powered by CognoDB</span>
+    </div>
+</nav>
+</body>
+</html>

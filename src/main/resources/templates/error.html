@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${title})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('home')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1 th:text="${title}">Something went wrong</h1>
+            <p class="subtitle">We couldn't complete that request</p>
+        </div>
+        <span class="status-badge status-down">
+            <span class="status-dot"></span>
+            <span>Error</span>
+        </span>
+    </header>
+
+    <div class="error-box" style="margin-bottom:20px">
+        <strong th:text="${title}">Error</strong>
+        <p style="margin:6px 0 0" th:text="${message}">Unable to connect to the database.</p>
+    </div>
+
+    <a href="/" class="btn">← Back to Dashboard</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('home')}"></div>
+<main class="main-content">
+    <header class="page-header">
+        <div>
+            <h1>SkillBridge</h1>
+            <p class="subtitle">Explore tech careers through the lens of skills, roles, and connections</p>
+        </div>
+        <div class="status-badge" th:classappend="${connected} ? ' status-up' : ' status-down'">
+            <span class="status-dot"></span>
+            <span th:text="${connected} ? 'CognoDB Connected' : 'Database Offline'">Status</span>
+        </div>
+        <a href="/pathfinder" class="btn btn-primary">Open Pathfinder →</a>
+    </header>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Skills</span>
+            <span class="stat-value" th:text="${stats.skillCount()}">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Roles</span>
+            <span class="stat-value" th:text="${stats.roleCount()}">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">People</span>
+            <span class="stat-value" th:text="${stats.personCount()}">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Companies</span>
+            <span class="stat-value" th:text="${stats.companyCount()}">0</span>
+        </div>
+        <div class="stat-card accent">
+            <span class="stat-label">Relationships</span>
+            <span class="stat-value" th:text="${stats.relationshipCount()}">0</span>
+        </div>
+    </section>
+
+    <section class="feature-grid">
+        <a href="/pathfinder" class="feature-card">
+            <div class="feature-icon">🧭</div>
+            <h3>Pathfinder</h3>
+            <p>Find multi-hop skill learning paths, bridge people between roles, and analyze skill gaps.</p>
+        </a>
+        <a href="/skills" class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>Skills Graph</h3>
+            <p>Browse 25+ tech skills connected by prerequisite relationships.</p>
+        </a>
+        <a href="/roles" class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Career Roles</h3>
+            <p>Explore roles and their required skill profiles.</p>
+        </a>
+        <a href="/people" class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Talent Network</h3>
+            <p>View professionals, their skills, and current roles.</p>
+        </a>
+    </section>
+
+    <section class="info-panel">
+        <h2>Why a graph database?</h2>
+        <p>Career paths aren't tables — they're networks. SkillBridge models skills, roles, people, and companies as a connected graph so we can ask questions like <em>"What's the shortest learning path from Java to System Design?"</em> or <em>"Who bridges Backend and ML Engineering through shared skills?"</em> — queries that require painful self-joins in SQL.</p>
+    </section>
+</main>
+</body>
+</html>
