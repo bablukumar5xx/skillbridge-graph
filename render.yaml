@@ -1,0 +1,21 @@
+# Render Blueprint — free-tier deployment for SkillBridge Graph.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: skillbridge-graph
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: COGNODB_URI
+        sync: false                 # set once in the Render dashboard
+      - key: COGNODB_USERNAME
+        value: cognodb
+      - key: COGNODB_PASSWORD
+        sync: false                # treat as secret, paste once
+      - key: SEED_DATA
+        value: true                # idempotent: skipped if the graph already has data
+    domains:
+      - skillbridge.onrender.com

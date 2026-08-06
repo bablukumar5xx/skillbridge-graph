@@ -28,7 +28,7 @@ public class GraphRepository {
         try {
             driver.verifyConnectivity();
             return true;
-        } catch (ServiceUnavailableException ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
